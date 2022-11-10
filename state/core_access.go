@@ -241,6 +241,7 @@ func (ca *CoreAccessor) SubmitTx(ctx context.Context, tx Tx) (*TxResponse, error
     return txResp.TxResponse, nil
 }
 
+// write a hook that takes data and puts on Filecoin in function below
 func (ca *CoreAccessor) SubmitTxWithBroadcastMode(
     ctx context.Context,
     tx Tx,
@@ -254,6 +255,9 @@ func (ca *CoreAccessor) SubmitTxWithBroadcastMode(
 }
 
 // write a hook that takes data and puts on Filecoin in function below
+
+// To use Web3.storage the user must have an API token. This token can be generated once an account is created: https://web3.storage/docs/intro/#get-an-api-token
+// Ensure the proper submit PayForData is POST, with the body including a field for the file(s) uploaded to Filecoin (using Web3.storage)
 func (ca *CoreAccessor) SubmitData(ctx context.Context, data []byte) (*TxResponse, error) {
     // c, _ := w3s.NewClient(w3s.WithToken("<AUTH_TOKEN>"))
     // f, _ := os.Open("images/examples.jpg")       // create image file in aforementioned directory
