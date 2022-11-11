@@ -266,15 +266,15 @@ func (ca *CoreAccessor) SubmitTx(ctx context.Context, tx Tx) (*TxResponse, error
     return txResp.TxResponse, nil
 }
 
-func putSingleFile(c w3s.Client) cid.Cid {
-	file, err := os.Open("images/donotresist.jpg")
-	if err != nil {
-		panic(err)
-	}
-	return putFile(c, file)
-}
+// func putSingleFile(c w3s.Client) cid.Cid {
+// 	file, err := os.Open("images/exampleq.jpg")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	return putFile(c, file)
+// }
 
-// func putMultipleFiles(c w3s.Client) cid.Cid {
+func putMultipleFiles(c w3s.Client) cid.Cid {
 // 	f0, err := os.Open("images/eample.jpg")
 // 	if err != nil {
 // 		panic(err)
@@ -283,41 +283,41 @@ func putSingleFile(c w3s.Client) cid.Cid {
 // 	if err != nil {
 // 		panic(err)
 // 	}
-// 	dir := w3fs.NewDir("comic", []fs.File{f0, f1})
+	// dir := w3fs.NewDir("comic", []fs.File{f0, f1})
+	// return putFile(c, dir)
+}
+
+// func putMultipleFilesAndDirectories(c w3s.Client) cid.Cid {
+// 	f0, err := os.Open("images/examplezz.jpg")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	f1, err := os.Open("images/examples.jpg")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	d0 := w3fs.NewDir("one", []fs.File{f0})
+// 	d1 := w3fs.NewDir("two", []fs.File{f1})
+// 	rootdir := w3fs.NewDir("comic", []fs.File{d0, d1})
+// 	return putFile(c, rootdir)
+// }
+
+// func putDirectory(c w3s.Client) cid.Cid {
+// 	dir, err := os.Open("images")
+// 	if err != nil {
+// 		panic(err)
+// 	}
 // 	return putFile(c, dir)
 // }
 
-func putMultipleFilesAndDirectories(c w3s.Client) cid.Cid {
-	f0, err := os.Open("images/examplezz.jpg")
-	if err != nil {
-		panic(err)
-	}
-	f1, err := os.Open("images/examples.jpg")
-	if err != nil {
-		panic(err)
-	}
-	d0 := w3fs.NewDir("one", []fs.File{f0})
-	d1 := w3fs.NewDir("two", []fs.File{f1})
-	rootdir := w3fs.NewDir("comic", []fs.File{d0, d1})
-	return putFile(c, rootdir)
-}
-
-func putDirectory(c w3s.Client) cid.Cid {
-	dir, err := os.Open("images")
-	if err != nil {
-		panic(err)
-	}
-	return putFile(c, dir)
-}
-
-func putFile(c w3s.Client, f fs.File, opts ...w3s.PutOption) cid.Cid {
-	cid, err := c.Put(context.Background(), f, opts...)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("https://%v.ipfs.dweb.link\n", cid)
-	return cid
-}
+// func putFile(c w3s.Client, f fs.File, opts ...w3s.PutOption) cid.Cid {
+// 	cid, err := c.Put(context.Background(), f, opts...)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Printf("https://%v.ipfs.dweb.link\n", cid)
+// 	return cid
+// }
 
 
 // write a hook that takes data and puts on Filecoin in function below
@@ -330,9 +330,22 @@ func (ca *CoreAccessor) SubmitTxWithBroadcastMode(
     if err != nil {
         return nil, err
     }
-	tx := putMultipleFiles(c w3s.Client) cid.Cid {
+    // first attempt a single (tx) file upload
+    // cid := putSingleFile(ca.coreConn)
+    
+    // then attempt to upload multiple tx files
+	// tx = w3fs.putFiles(c w3s.Client) cid.Cid {
     return txResp.TxResponse, nil
 }
+
+func putFile(c w3s.Client, f fs.File, opts ...w3s.PutOption) cid.Cid {
+	// cid, err := c.Put(context.Background(), f, opts...)
+    cid, err := c.Put(context.Background(), TxResponse, opts...)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("https://%v.ipfs.dweb.link\n", cid)
+	return cid
 
 // write a hook that takes data and puts on Filecoin in function below
 
@@ -361,7 +374,7 @@ func (ca *CoreAccessor) SubmitTxWithBroadcastMode(
     // // res is a http.Response with an extra method for reading IPFS UnixFS files!
     // f, fsys, _ := res.Files()
     // return ca.SubmitPayForData(ctx, namespace.ID{}, data, 0)
-}
+// }
 
 // write a hook that takes data and puts on Filecoin in function below
 
