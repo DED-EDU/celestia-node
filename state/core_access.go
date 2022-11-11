@@ -5,6 +5,9 @@ import (
     "errors"
     "fmt"
     "time"
+	"io"
+	"io/fs"
+	"os"
 
     "github.com/cosmos/cosmos-sdk/api/tendermint/abci"
     "github.com/cosmos/cosmos-sdk/store/rootmulti"
@@ -24,7 +27,29 @@ import (
     "github.com/celestiaorg/nmt/namespace"
 
     "github.com/celestiaorg/celestia-node/header"
+
+	"github.com/ipfs/go-cid"
+	"github.com/web3-storage/go-w3s-client"
+	w3fs "github.com/web3-storage/go-w3s-client/fs"
 )
+
+// Usage:
+// TOKEN="API_TOKEN" go run ./main.go
+func main() {
+	c, err := w3s.NewClient(
+		w3s.WithEndpoint(os.Getenv("ENDPOINT")),
+		w3s.WithToken(os.Getenv("TOKEN")),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	// cid := putSingleFile(c)
+	// getStatusForCid(c, cid)
+	// getStatusForKnownCid(c)
+	getFiles(c)
+	// listUploads(c)
+}
 
 var (
     log              = logging.Logger("state")
@@ -241,6 +266,60 @@ func (ca *CoreAccessor) SubmitTx(ctx context.Context, tx Tx) (*TxResponse, error
     return txResp.TxResponse, nil
 }
 
+func putSingleFile(c w3s.Client) cid.Cid {
+	file, err := os.Open("images/donotresist.jpg")
+	if err != nil {
+		panic(err)
+	}
+	return putFile(c, file)
+}
+
+// func putMultipleFiles(c w3s.Client) cid.Cid {
+// 	f0, err := os.Open("images/eample.jpg")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	f1, err := os.Open("images/example.jpg")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	dir := w3fs.NewDir("comic", []fs.File{f0, f1})
+// 	return putFile(c, dir)
+// }
+
+func putMultipleFilesAndDirectories(c w3s.Client) cid.Cid {
+	f0, err := os.Open("images/examplezz.jpg")
+	if err != nil {
+		panic(err)
+	}
+	f1, err := os.Open("images/examples.jpg")
+	if err != nil {
+		panic(err)
+	}
+	d0 := w3fs.NewDir("one", []fs.File{f0})
+	d1 := w3fs.NewDir("two", []fs.File{f1})
+	rootdir := w3fs.NewDir("comic", []fs.File{d0, d1})
+	return putFile(c, rootdir)
+}
+
+func putDirectory(c w3s.Client) cid.Cid {
+	dir, err := os.Open("images")
+	if err != nil {
+		panic(err)
+	}
+	return putFile(c, dir)
+}
+
+func putFile(c w3s.Client, f fs.File, opts ...w3s.PutOption) cid.Cid {
+	cid, err := c.Put(context.Background(), f, opts...)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("https://%v.ipfs.dweb.link\n", cid)
+	return cid
+}
+
+
 // write a hook that takes data and puts on Filecoin in function below
 func (ca *CoreAccessor) SubmitTxWithBroadcastMode(
     ctx context.Context,
@@ -251,6 +330,7 @@ func (ca *CoreAccessor) SubmitTxWithBroadcastMode(
     if err != nil {
         return nil, err
     }
+	tx := putMultipleFiles(c w3s.Client) cid.Cid {
     return txResp.TxResponse, nil
 }
 
@@ -258,7 +338,7 @@ func (ca *CoreAccessor) SubmitTxWithBroadcastMode(
 
 // To use Web3.storage the user must have an API token. This token can be generated once an account is created: https://web3.storage/docs/intro/#get-an-api-token
 // Ensure the proper submit PayForData is POST, with the body including a field for the file(s) uploaded to Filecoin (using Web3.storage)
-func (ca *CoreAccessor) SubmitData(ctx context.Context, data []byte) (*TxResponse, error) {
+// func (ca *CoreAccessor) SubmitData(ctx context.Context, data []byte) (*TxResponse, error) {
     // c, _ := w3s.NewClient(w3s.WithToken("<AUTH_TOKEN>"))
     // f, _ := os.Open("images/examples.jpg")       // create image file in aforementioned directory
     // // OR add a whole directory:
